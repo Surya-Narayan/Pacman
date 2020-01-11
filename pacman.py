@@ -6,7 +6,7 @@ Exercises
 2. Change the number of ghosts.
 3. Change where pacman starts.
 4. Make the ghosts faster/slower.
-5. Make the ghosts smarter.
+5. Make the ghosts smarter.+
 
 """
 
