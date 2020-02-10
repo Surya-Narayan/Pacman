@@ -16,7 +16,7 @@ class App:
         self.cell_height=MAZE_HEIGHT//30
         self.player=Player(self,PLAYER_START_POS)
         self.load()
-
+        
     def run(self):
         while(self.running):
             if self.state=='start':
