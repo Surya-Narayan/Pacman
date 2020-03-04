@@ -166,7 +166,7 @@ def main():
     plt.ylabel("y-axis")
     plt.title("Shuffled Frogs")
     # Show plot
-    plt.show()
+    # plt.show()
 
 if __name__ == '__main__':
     main()
