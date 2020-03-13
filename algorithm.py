@@ -16,9 +16,10 @@ def opt_func(value):
     Returns:
         float -- The output value or fitness of the frog
     """
-
-    output = np.sqrt((value ** 2).sum())
-    return output
+    sum=0
+    for i in value:
+        sum = sum + abs(i)
+    return sum
 
 def gen_frogs(frogs, dimension, sigma, mu):
     """Generates a random frog population from gaussian normal distribution.
@@ -134,13 +135,13 @@ def sfla(opt_func, frogs=30, dimension=2, sigma=1, mu=0, mplx_no=5, mplx_iters=1
     # Best solution as greatest frog
     best_solun = frogs[int(memeplexes[0, 0])]
     # For the number of iterations
-    for i in range(solun_iters):
+    for _ in range(solun_iters):
         # Shuffle memeplexes
         memeplexes = shuffle_memeplexes(frogs, memeplexes)
         # For each memeplex
         for mplx_idx, memeplex in enumerate(memeplexes):
             # For number of memeplex iterations
-            for j in range(mplx_iters):
+            for _ in range(mplx_iters):
                 # Perform local search
                 frogs = local_search(frogs, memeplex, opt_func, sigma, mu)
             # Rearrange memeplexes
@@ -166,7 +167,8 @@ def main():
     plt.ylabel("y-axis")
     plt.title("Shuffled Frogs")
     # Show plot
-    plt.show()
+    # plt.show()
 
 if __name__ == '__main__':
-    main()
+    for i in range(0,10):
+        main()
