@@ -32,11 +32,15 @@ class App:
         for i in range(len(self.enemies)):
             frogs.append(self.enemies[i].grid_pos)
         frogs=np.array(frogs)
-        print(frogs)
-        sol,frog,mem=sfla(opt_func,frogs, 2, 1, 0, 2, 1, 1)
+        
+        # print(frogs)
+        print(self.player.grid_pos)
+        sol,frog,mem=sfla(opt_func,40, 2, 1, 0, 5, 15, 50)
+        print("Solution")
         print(sol)
+        print("-----")
         print(frog)
-        # print(mem)
+        print("-----")
         while self.running:
             if self.state == 'start':
                 self.start_events()

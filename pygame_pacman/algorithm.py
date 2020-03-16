@@ -16,8 +16,9 @@ def opt_func(value):
     Returns:
         float -- The output value or fitness of the frog
     """
-
-    output = np.sqrt((value ** 2).sum())
+    l=[13,29]
+    l=np.array(l)
+    output = np.sqrt(((value-l) ** 2).sum())
     return output
 
 def gen_frogs(frogs, dimension, sigma, mu):
@@ -32,9 +33,13 @@ def gen_frogs(frogs, dimension, sigma, mu):
     Returns:
         numpy.ndarray -- A frogs x dimension array
     """
-    frogs = sigma * (np.random.randn(frogs, dimension)) + mu
+    l=[]
+    for i in range(100):
+        l.append(np.random.randint( (50,50) ) )
+    l=np.array(l)
+    # frogs = sigma * (np.random.randn(frogs, dimension)) + mu
     # print(frogs)
-    return frogs
+    return l
 
 def sort_frogs(frogs, mplx_no, opt_func):
     """Sorts the frogs in decending order of fitness by the given function.
@@ -88,6 +93,9 @@ def local_search(frogs, memeplex, opt_func, sigma, mu):
         frog_w_new = gen_frogs(1, frogs.shape[1], sigma, mu)[0]
     # Replace worst frog
     frogs[int(memeplex[-1])] = frog_w_new
+    # print("--------------------")
+    # print(frogs)
+    # print("---------------------")
     return frogs
 
 def shuffle_memeplexes(frogs, memeplexes):
@@ -129,7 +137,7 @@ def sfla(opt_func, frogs, dimension=2, sigma=1, mu=0, mplx_no=5, mplx_iters=10, 
     """
 
     # Generate frogs around the solution
-    # frogs = gen_frogs(frogs, dimension, sigma, mu)
+    frogs = gen_frogs(frogs, dimension, sigma, mu)
     # print(frogs)
     # Arrange frogs and sort into memeplexes
     memeplexes = sort_frogs(frogs, mplx_no, opt_func)
