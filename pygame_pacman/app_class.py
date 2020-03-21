@@ -6,6 +6,8 @@ from player_class import *
 from enemy_class import *
 from algorithm import *
 
+import matplotlib.pyplot as plt
+
 pygame.init()
 vec = pygame.math.Vector2
 
@@ -28,19 +30,15 @@ class App:
         self.make_enemies()
 
     def run(self):
-        frogs=[]
-        for i in range(len(self.enemies)):
-            frogs.append(self.enemies[i].grid_pos)
-        frogs=np.array(frogs)
-        
         # print(frogs)
-        print(self.player.grid_pos)
-        sol,frog,mem=sfla(opt_func,40, 2, 1, 0, 5, 15, 50)
-        print("Solution")
-        print(sol)
-        print("-----")
-        print(frog)
-        print("-----")
+        # print(self.player.grid_pos)
+        # sol,frog,mem=sfla(opt_func,40, 2, 1, 0, 5, 15, 10)
+        # print("Solution")
+        # print(sol)
+        # print("-----")
+        # print(len(frog))
+        # self.frog=frog
+        # print("-----")
         while self.running:
             if self.state == 'start':
                 self.start_events()

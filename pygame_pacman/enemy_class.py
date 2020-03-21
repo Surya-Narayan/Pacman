@@ -67,6 +67,9 @@ class Enemy:
         return False
 
     def move(self):
+        optimum=[self.app.player.grid_pos[0],self.app.player.grid_pos[1]]
+        sol,frog,mem=sfla(optimum,opt_func,40, 2, 1, 0, 5, 5, 5)
+        self.frog=frog
         if self.personality == "random":
             self.direction = self.get_random_direction()
         if self.personality == "slow":
@@ -82,11 +85,27 @@ class Enemy:
         ydir = next_cell[1] - self.grid_pos[1]
         return vec(xdir, ydir)
 
+    def manhattan(self,o):
+        # print(o,type(o))
+        return abs(self.grid_pos[0]-int(o[0])) +  abs(self.grid_pos[1]-int(o[1]))
+
     def find_next_cell_in_path(self, target):
-        path = self.BFS([int(self.grid_pos.x), int(self.grid_pos.y)], [
-                        int(target[0]), int(target[1])])
+        # path = self.BFS([int(self.grid_pos.x), int(self.grid_pos.y)], [
+                        # int(target[0]), int(target[1])])
         # print(path)
-        return path[1]
+        min=[]
+        d=1000000
+        # print(frog)
+        # print("----")
+        # print(sol)
+        # print("----")
+        # print(mem)
+        for f in self.frog:
+            if(self.manhattan(f)<d):
+                d=self.manhattan(f)
+                min=f
+        return min
+        # return path[1]
 
     def BFS(self, start, target):
         grid = [[0 for x in range(28)] for x in range(30)]
