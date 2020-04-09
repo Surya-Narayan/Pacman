@@ -2,9 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 best_solun=np.array(2)
+pos=[0,0]
+
 def opt_func(value):
-    l=[15,15]
-    l=np.array(l)
+    global pos
+    l=np.array(pos)
     # output = np.sqrt((value ** 2).sum())
     output= abs(l[0]-value[0])+ abs(l[1]-value[1])
     return output
@@ -62,7 +64,10 @@ def conv(frogs):
         f1.append(tuple(f))
     return f1
 
-def sfla(opt_func, frogs, dimension, mplx_no, mplx_iters, solun_iters):
+def sfla(p,opt_func, frogs, dimension, mplx_no, mplx_iters, solun_iters):
+    global pos
+    pos[0]=p[0]
+    pos[1]=p[1]
     # Generate frogs around the solution
     frogs = gen_frogs(frogs, dimension)
     memeplexes = sort_frogs(frogs, mplx_no, opt_func)
@@ -112,14 +117,15 @@ def sfla(opt_func, frogs, dimension, mplx_no, mplx_iters, solun_iters):
     return best_solun, frogs, memeplexes.astype(int)
 
 def main():
+    p=[15,15]
     # Run algorithm
-    solun, frogs, memeplexes = sfla(opt_func, 40, 2, 5, 25, 50)
+    solun, frogs, memeplexes = sfla(p,opt_func, 20, 2, 5, 25, 50)
     print("Optimal Solution (closest to zero): {}".format(solun))
     # print(frogs)
     # print(memeplexes)
 
     plt.scatter(solun[0], solun[1], marker='o', label="Optimal Solution")
-    plt.scatter(15, 15, marker='*', label='Actual Solution')
+    plt.scatter(p[0], p[1], marker='*', label='Actual Solution')
     
     # Place memeplexes
     # for idx, memeplex in enumerate(memeplexes):
