@@ -90,7 +90,7 @@ def sfla(p,opt_func, frogs, dimension, mplx_no, mplx_iters, solun_iters):
             new_best_solun = frogs[int(memeplexes[0, 0])]
             if opt_func(new_best_solun) < opt_func(best_solun):
                 best_solun = new_best_solun
-        if(i%5==0):
+        if(i%2==0):
             # print("Plot done")
             # f1=conv(frogs)
             # # for f in frogs:
@@ -119,7 +119,7 @@ def sfla(p,opt_func, frogs, dimension, mplx_no, mplx_iters, solun_iters):
 def main():
     p=[15,15]
     # Run algorithm
-    solun, frogs, memeplexes = sfla(p,opt_func, 20, 2, 5, 25, 50)
+    solun, frogs, memeplexes = sfla(p,opt_func, 40, 2, 5, 20, 20)
     print("Optimal Solution (closest to zero): {}".format(solun))
     # print(frogs)
     # print(memeplexes)
