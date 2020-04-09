@@ -1,6 +1,7 @@
 import pygame
 from settings import *
 vec = pygame.math.Vector2
+import math
 
 
 class Player:
@@ -15,6 +16,8 @@ class Player:
         self.current_score = 0
         self.speed = 2
         self.lives = 1
+        self.img=pygame.image.load('player.png')
+        self.img = pygame.transform.scale(self.img, (self.app.cell_width-1, self.app.cell_width-1))
 
     def update(self):
         if self.able_to_move:
@@ -32,9 +35,9 @@ class Player:
             self.eat_coin()
 
     def draw(self):
-        pygame.draw.circle(self.app.screen, PLAYER_COLOUR, (int(self.pix_pos.x),
-                                                            int(self.pix_pos.y)), self.app.cell_width//2-2)
-
+        # pygame.draw.circle(self.app.screen, PLAYER_COLOUR, (int(self.pix_pos.x),
+        #                                                     int(self.pix_pos.y)), self.app.cell_width//2-2) 
+        self.app.screen.blit(self.img,(int(self.pix_pos.x-self.app.cell_width//2),int(self.pix_pos.y-self.app.cell_width//2)))
         # Drawing player lives
         for x in range(self.lives):
             pygame.draw.circle(self.app.screen, PLAYER_COLOUR, (30 + 20*x, HEIGHT - 15), 7)

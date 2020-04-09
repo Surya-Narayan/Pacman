@@ -2,9 +2,9 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set_style("darkgrid")
-sns.set_context("notebook")
+
+allf=[]
+globalopt=[]
 
 def opt_func(value):
     """The mathematical function to optimize. Here it calculates the distance to origin,
@@ -16,8 +16,9 @@ def opt_func(value):
     Returns:
         float -- The output value or fitness of the frog
     """
-    l=[13,29]
-    l=np.array(l)
+    # print(globalopt)
+    l=np.array(globalopt)
+    # print(l)
     output = np.sqrt(((value-l) ** 2).sum())
     return output
 
@@ -34,8 +35,11 @@ def gen_frogs(frogs, dimension, sigma, mu):
         numpy.ndarray -- A frogs x dimension array
     """
     l=[]
-    for i in range(100):
-        l.append(np.random.randint( (50,50) ) )
+    for i in range(frogs):
+        l.append(np.random.randint( (28,30) ) )
+    global allf
+    for i in l:
+        allf.append(i)
     l=np.array(l)
     # frogs = sigma * (np.random.randn(frogs, dimension)) + mu
     # print(frogs)
@@ -93,6 +97,8 @@ def local_search(frogs, memeplex, opt_func, sigma, mu):
         frog_w_new = gen_frogs(1, frogs.shape[1], sigma, mu)[0]
     # Replace worst frog
     frogs[int(memeplex[-1])] = frog_w_new
+    global allf
+    allf.append(frog_w_new)
     # print("--------------------")
     # print(frogs)
     # print("---------------------")
@@ -117,7 +123,7 @@ def shuffle_memeplexes(frogs, memeplexes):
     temp = temp.reshape((memeplexes.shape[0], memeplexes.shape[1]))
     return temp
 
-def sfla(opt_func, frogs, dimension=2, sigma=1, mu=0, mplx_no=5, mplx_iters=10, solun_iters=50):
+def sfla(optimum,opt_func, frogs, dimension=2, sigma=1, mu=0, mplx_no=5, mplx_iters=10, solun_iters=50):
     """Performs the Shuffled Leaping Frog Algorithm.
     
     Arguments:
@@ -135,7 +141,11 @@ def sfla(opt_func, frogs, dimension=2, sigma=1, mu=0, mplx_no=5, mplx_iters=10, 
     Returns:
         tuple(numpy.ndarray, numpy.ndarray, numpy.ndarray) -- [description]
     """
-
+    global globalopt
+    globalopt=optimum
+    global allf
+    allf=[]
+    # print(globalopt)
     # Generate frogs around the solution
     frogs = gen_frogs(frogs, dimension, sigma, mu)
     # print(frogs)
@@ -159,32 +169,35 @@ def sfla(opt_func, frogs, dimension=2, sigma=1, mu=0, mplx_no=5, mplx_iters=10, 
             new_best_solun = frogs[int(memeplexes[0, 0])]
             if opt_func(new_best_solun) < opt_func(best_solun):
                 best_solun = new_best_solun
-    return best_solun, frogs, memeplexes.astype(int)
+    # return best_solun, frogs, memeplexes.astype(int)
+    for i in range(len(allf)):
+        allf[i]=list(allf[i])
+        allf[i][0]=int(allf[i][0])
+        allf[i][1]=int(allf[i][1])
+    allf1=[]
+    for i in allf:
+        if i not in allf1:
+            allf1.append(i)    
+    return best_solun, allf1, memeplexes.astype(int)
 
 def main():
     # Run algorithm
-    #Frogs
-    frogs=[]
-    for i in range(100):
-        frogs.append(np.array([i,i]))
-    frogs=np.array(frogs)
-    # frogs=np.reshape(frogs,(100,2))
-    
-    solun, frogs, memeplexes = sfla(opt_func, frogs, 2, 1, 0, 5, 25, 50)
-    # print(frogs)
+    solun, frogs, memeplexes = sfla([0,0],opt_func, 40, 2, 1, 0, 5, 25, 50)
+    print(len(frogs))
     print("Optimal Solution (closest to zero): {}".format(solun))
+    # print(frogs)
     # Place memeplexes
-    for idx, memeplex in enumerate(memeplexes):
-        plt.scatter(frogs[memeplex, 0], frogs[memeplex, 1], marker='x', label="memeplex {}".format(idx))
-    plt.scatter(solun[0], solun[1], marker='o', label="Optimal Solution")
-    plt.scatter(0, 0, marker='*', label='Actual Solution')
-    # Plot properties
-    plt.legend()
-    plt.xlabel("x-axis")
-    plt.ylabel("y-axis")
-    plt.title("Shuffled Frogs")
-    # Show plot
+    # for idx, memeplex in enumerate(memeplexes):
+    #     plt.scatter(frogs[memeplex, 0], frogs[memeplex, 1], marker='x', label="memeplex {}".format(idx))
+    # plt.scatter(solun[0], solun[1], marker='o', label="Optimal Solution")
+    # plt.scatter(13, 29, marker='*', label='Actual Solution')
+    # # Plot properties
+    # plt.legend()
+    # plt.xlabel("x-axis")
+    # plt.ylabel("y-axis")
+    # plt.title("Shuffled Frogs")
+    # # Show plot
     # plt.show()
 
-# if __name__ == '__main__':
-    # main()
+if __name__ == '__main__':
+    main()

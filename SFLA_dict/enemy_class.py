@@ -67,26 +67,75 @@ class Enemy:
         return False
 
     def move(self):
+        # optimum=[self.app.player.grid_pos[0],self.app.player.grid_pos[1]]
+        # sol,frog,mem=sfla(optimum,opt_func,40, 2, 1, 0, 5, 5, 5)
+        # self.frog=frog
         if self.personality == "random":
             self.direction = self.get_random_direction()
         if self.personality == "slow":
             self.direction = self.get_path_direction(self.target)
         if self.personality == "speedy":
             self.direction = self.get_path_direction(self.target)
+            # print(self.direction)
         if self.personality == "scared":
             self.direction = self.get_path_direction(self.target)
 
     def get_path_direction(self, target):
         next_cell = self.find_next_cell_in_path(target)
+        # if self.personality == "speedy":
+            # print(next_cell,self.grid_pos)
         xdir = next_cell[0] - self.grid_pos[0]
         ydir = next_cell[1] - self.grid_pos[1]
         return vec(xdir, ydir)
 
+    def manhattan(self,o):
+        # print(o,type(o))
+        return abs(self.grid_pos[0]-int(o[0])) +  abs(self.grid_pos[1]-int(o[1]))
+
+    def manhattan1(self,o,o2):
+        # print(o,type(o))
+        return abs(int(o[0])-int(o2[0])) +  abs(int(o[1])-int(o2[1]))
+
     def find_next_cell_in_path(self, target):
-        path = self.BFS([int(self.grid_pos.x), int(self.grid_pos.y)], [
-                        int(target[0]), int(target[1])])
+        # path = self.BFS([int(self.grid_pos.x), int(self.grid_pos.y)], [
+                        # int(target[0]), int(target[1])])
         # print(path)
+        # print("Called")
+        min=[]
+        d=1000000
+        # for f in (self.app.frog.keys()):
+            # print(f,":",self.app.frog[f])
+        for f in self.app.frog.keys():
+            s=list(f)
+            if(self.manhattan1(s,self.app.player.grid_pos)<d):
+                d=self.manhattan1(s,self.app.player.grid_pos)
+                min=s
+        # print(self.app.possible)
+        d=100000000
+        min2=[]
+        if(len(self.app.frog[tuple(min)]) > 0):
+            for i in self.app.frog[tuple(min)]:
+                if(self.manhattan1(i,self.app.player.grid_pos)<d):
+                    d=self.manhattan1(i,self.app.player.grid_pos)
+                    min2=i
+            # min=self.app.frog[tuple(min)][-1]
+        # print(mins)
+        # if(len(min2)!=0):
+            # min=min2
+            # print(min)
+        d=10000000
+        min1=[]
+        for i in self.app.possible:
+            if(self.manhattan1(i,min)<d):
+                d=self.manhattan1(i,min)
+                min1=i
+        path = self.BFS([int(self.grid_pos.x), int(self.grid_pos.y)], [
+                        int(min1[0]), int(min1[1])])
+        # print(path)
+        if(len(path)==1):
+            return path[0]
         return path[1]
+
 
     def BFS(self, start, target):
         grid = [[0 for x in range(28)] for x in range(30)]

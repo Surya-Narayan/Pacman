@@ -6,6 +6,8 @@ from player_class import *
 from enemy_class import *
 from algorithm import *
 
+import matplotlib.pyplot as plt
+
 pygame.init()
 vec = pygame.math.Vector2
 
@@ -20,6 +22,7 @@ class App:
         self.cell_height = MAZE_HEIGHT//ROWS
         self.walls = []
         self.coins = []
+        self.possible=[]
         self.enemies = []
         self.e_pos = []
         self.p_pos = None
@@ -28,19 +31,6 @@ class App:
         self.make_enemies()
 
     def run(self):
-        frogs=[]
-        for i in range(len(self.enemies)):
-            frogs.append(self.enemies[i].grid_pos)
-        frogs=np.array(frogs)
-        
-        # print(frogs)
-        print(self.player.grid_pos)
-        sol,frog,mem=sfla(opt_func,40, 2, 1, 0, 5, 15, 50)
-        print("Solution")
-        print(sol)
-        print("-----")
-        print(frog)
-        print("-----")
         while self.running:
             if self.state == 'start':
                 self.start_events()
@@ -85,6 +75,7 @@ class App:
                         self.walls.append(vec(xidx, yidx))
                     elif char == "C":
                         self.coins.append(vec(xidx, yidx))
+                        self.possible.append([xidx,yidx])
                     elif char == "P":
                         self.p_pos = [xidx, yidx]
                     elif char in ["2", "3", "4", "5"]:
@@ -168,7 +159,19 @@ class App:
 
     def playing_update(self):
         self.player.update()
+        optimum=[self.player.grid_pos[0],self.player.grid_pos[1]]
+        sol,frog,mem=sfla(optimum,opt_func,20, 2, 1, 0, 5, 5, 5)
+        self.sol=sol
+        frog1=[]
+        for f in frog:
+            if f not in self.walls:
+                frog1.append(f)
+        self.frog=frog1
+        # print(frog1)
+        # print(optimum)
+        # print(len(frog))
         for enemy in self.enemies:
+            # print("Called")
             enemy.update()
 
         for enemy in self.enemies:
