@@ -34,10 +34,10 @@ def local_search(frogs, memeplex, opt_func):
     frog_g = best_solun
     # print(memeplex)
     # Move worst wrt best frog
-    frog_w_new = frog_w + (np.random.rand() * (frog_b - frog_w))
+    frog_w_new = frog_w + (np.random.uniform(0.0,1.0) * (frog_b - frog_w))
     # If change not better, move worst wrt greatest frog
     if opt_func(frog_w_new) > opt_func(frog_w):
-        frog_w_new = frog_w + (np.random.rand() * (frog_g - frog_w))
+        frog_w_new = frog_w + (np.random.uniform(0.0,1.0) * (frog_g - frog_w))
     # If change not better, random new worst frog
     if opt_func(frog_w_new) > opt_func(frog_w):
         frog_w_new = gen_frogs(1, frogs.shape[1])[0]
@@ -114,7 +114,7 @@ def sfla(p,opt_func, frogs, dimension, mplx_no, mplx_iters, solun_iters):
 def main():
     # Run algorithm
     p=[15,15]
-    solun, frogs, memeplexes = sfla(p,opt_func, 20, 2, 5, 10, 10)
+    solun, frogs, memeplexes = sfla(p,opt_func, 40, 2, 5, 15, 15)
     print("Optimal Solution (closest to zero): {}".format(solun))
     # print(frogs)
     # print(memeplexes)
