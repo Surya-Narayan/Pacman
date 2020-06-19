@@ -7,13 +7,13 @@ pos=[0,0]
 def opt_func(value):
     global pos
     l=np.array(pos)
-    # output = np.sqrt((value ** 2).sum())
+    # output = np.sqrt(( (value-l) ** 2).sum())
     output= abs(l[0]-value[0])+ abs(l[1]-value[1])
     return output
 
 def gen_frogs(frogs, dimension):
-    frogs =  (np.random.randint(1,28,(frogs, dimension)) )
-    # frogs =  (np.random.randint(1,28,(frogs, dimension))) 
+    # frogs =  (np.random.randn(frogs, dimension)) 
+    frogs =  (np.random.randint(1,28,(frogs, dimension))) 
     return frogs
 
 def sort_frogs(frogs, mplx_no, opt_func):
@@ -33,29 +33,11 @@ def local_search(frogs, memeplex, opt_func):
     frog_b = frogs[int(memeplex[0])]
     frog_g = best_solun
     # print(memeplex)
-    
-    mn=sum(frogs[int(i)] for i in memeplex)/len(memeplex)
-    median=frogs[int(memeplex[len(memeplex)//2])]
     # Move worst wrt best frog
-    
-    # a=(frog_b - frog_w)
-    # a=a/(min(abs(a))+0.00001)
-    # frog_w_new = frog_w + a
-    rndm=np.random.randn()
-    wtd_avg=rndm*(mn)+(1-rndm)*median
-    # frog_w_new = frog_w + (np.random.randn() * (wtd_avg - frog_w))
-    frog_w_new = frog_w + (1 * (wtd_avg - frog_w))
-    frog_w_new.astype(int)
-
-    
+    frog_w_new = frog_w + (np.random.uniform(0.0,1.0) * (frog_b - frog_w))
     # If change not better, move worst wrt greatest frog
     if opt_func(frog_w_new) > opt_func(frog_w):
-        # a=(frog_g - frog_w)
-        # a=a/(min(abs(a))+0.00001)
-        # frog_w_new = frog_w + a
-        frog_w_new = frog_w + (np.random.randn() * (frog_g - frog_w))
-        frog_w_new.astype(int)
-
+        frog_w_new = frog_w + (np.random.uniform(0.0,1.0) * (frog_g - frog_w))
     # If change not better, random new worst frog
     if opt_func(frog_w_new) > opt_func(frog_w):
         frog_w_new = gen_frogs(1, frogs.shape[1])[0]
@@ -77,7 +59,6 @@ def conv(frogs):
     for f in frogs:
         f1.append(tuple(f))
     return f1
-
 def sfla(p,opt_func, frogs, dimension, mplx_no, mplx_iters, solun_iters):
     global pos
     pos[0]=p[0]
@@ -131,9 +112,9 @@ def sfla(p,opt_func, frogs, dimension, mplx_no, mplx_iters, solun_iters):
     return best_solun, frogs, memeplexes.astype(int)
 
 def main():
-    p=[15,15]
     # Run algorithm
-    solun, frogs, memeplexes = sfla(p,opt_func, 40, 2, 5, 20, 20)
+    p=[15,15]
+    solun, frogs, memeplexes = sfla(p,opt_func, 40, 2, 5, 15, 15)
     print("Optimal Solution (closest to zero): {}".format(solun))
     # print(frogs)
     # print(memeplexes)

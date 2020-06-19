@@ -5,6 +5,10 @@ from algorithm import *
 
 vec = pygame.math.Vector2
 
+count=0
+c=0
+
+prev_pos=[13,29]
 
 class Enemy:
     def __init__(self, app, pos, number):
@@ -25,6 +29,7 @@ class Enemy:
         if self.target != self.grid_pos:
             self.pix_pos += self.direction * self.speed
             if self.time_to_move():
+                # print(count)
                 self.move()
 
         # Setting grid position in reference to pix position
@@ -32,6 +37,13 @@ class Enemy:
                             self.app.cell_width//2)//self.app.cell_width+1
         self.grid_pos[1] = (self.pix_pos[1]-TOP_BOTTOM_BUFFER +
                             self.app.cell_height//2)//self.app.cell_height+1
+        global c
+        f=open("{}.txt".format(c),'a')
+        f.write("({},{})\n".format(self.grid_pos[0],self.grid_pos[1]))
+        c=(c+1)%4
+        global count
+        count+=1
+                
 
     def draw(self):
         pygame.draw.circle(self.app.screen, self.colour,
@@ -45,7 +57,7 @@ class Enemy:
         return speed
 
     def set_target(self):
-        if self.personality == "speedy" or self.personality == "slow":
+        if self.personality == "speedy" or self.personality == "slow" or self.personality == "scared":
             return self.app.player.grid_pos
         else:
             if self.app.player.grid_pos[0] > COLS//2 and self.app.player.grid_pos[1] > ROWS//2:
@@ -97,23 +109,33 @@ class Enemy:
         return abs(int(o[0])-int(o2[0])) +  abs(int(o[1])-int(o2[1]))
 
     def find_next_cell_in_path(self, target):
-        # path = self.BFS([int(self.grid_pos.x), int(self.grid_pos.y)], [
-                        # int(target[0]), int(target[1])])
-        # print(path)
-        # print("Called")
+        global prev_pos
+        
+        if(self.manhattan1(target,[self.grid_pos.x,self.grid_pos.y])<5 or prev_pos==self.app.player.grid_pos):
+            path = self.BFS([int(self.grid_pos.x), int(self.grid_pos.y)], [
+                            int(target[0]), int(target[1])])
+            return path[1]
+        
+        #Get the key closest to the player
         min=[]
         d=1000000
-        # for f in (self.app.frog.keys()):
-            # print(f,":",self.app.frog[f])
         for f in self.app.frog.keys():
             s=list(f)
             if(self.manhattan1(s,self.app.player.grid_pos)<d):
                 d=self.manhattan1(s,self.app.player.grid_pos)
                 min=s
-        # print(self.app.possible)
+
+
         d=100000000
         min2=[]
-        if(len(self.app.frog[tuple(min)]) > 0):
+        #If no frog reaches the player, use BFS
+        if(len(list(self.app.frog.keys()))==0 or len(self.app.frog[tuple(min)]) <= 0):
+            path = self.BFS([int(self.grid_pos.x), int(self.grid_pos.y)], [
+                            int(target[0]), int(target[1])])
+            return path[1]
+
+        #min2 has the value from list closest to the player
+        else:
             for i in self.app.frog[tuple(min)]:
                 if(self.manhattan1(i,self.app.player.grid_pos)<d):
                     d=self.manhattan1(i,self.app.player.grid_pos)
@@ -123,6 +145,8 @@ class Enemy:
         # if(len(min2)!=0):
             # min=min2
             # print(min)
+
+        #min1 is the position on the board closest to the chosen key
         d=10000000
         min1=[]
         for i in self.app.possible:
@@ -132,6 +156,9 @@ class Enemy:
         path = self.BFS([int(self.grid_pos.x), int(self.grid_pos.y)], [
                         int(min1[0]), int(min1[1])])
         # print(path)
+
+        prev_pos[0]=self.app.player.grid_pos[0]
+        prev_pos[1]=self.app.player.grid_pos[1]
         if(len(path)==1):
             return path[0]
         return path[1]
@@ -192,12 +219,16 @@ class Enemy:
 
     def set_colour(self):
         if self.number == 0:
+            ##BLUE
             return (43, 78, 203)
         if self.number == 1:
+            ##Yellow
             return (197, 200, 27)
         if self.number == 2:
+            ##RED
             return (189, 29, 29)
         if self.number == 3:
+            ##Orange
             return (215, 159, 33)
 
     def set_personality(self):

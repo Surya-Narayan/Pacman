@@ -1,7 +1,7 @@
- #! usr/bin/python3
-
 import numpy as np
 import matplotlib.pyplot as plt
+import time
+import math
 
 allf=dict()
 globalopt=[]
@@ -81,6 +81,10 @@ def mean_memeplexes(frogs,memeplex):
     s[1]=s[1]/len(memeplex)
     return s
 
+def manhattan1(o,o2):
+    # print(o,type(o))
+    return abs(int(o[0])-int(o2[0])) +  abs(int(o[1])-int(o2[1]))
+
 def local_search(frogs, memeplex, opt_func, sigma, mu):
     """Performs the local search for a memeplex.
     
@@ -100,26 +104,53 @@ def local_search(frogs, memeplex, opt_func, sigma, mu):
     frog_w = frogs[int(memeplex[-1])]
     frog_b = frogs[int(memeplex[0])]
     frog_g = frogs[0]
-    # Move worst wrt best frog
-    
+
+    #Get mean and median
+    mn=sum(frogs[int(i)] for i in memeplex)/len(memeplex)
+    median=frogs[int(memeplex[len(memeplex)//2])]
+
+    # Move worst wrt best frog    
     # frog_w_new = frog_w + (np.random.randn() * (frog_b - frog_w))
+    # frog_w_new.astype(int)
+
+    rndm=np.random.randn()
+    wtd_avg=rndm*(mn)+(1-rndm)*median
+    if manhattan1(mn,frog_b)>manhattan1(median,frog_b):
+        avg=mn
+    else:
+        avg=median
+    # frog_w_new = frog_w + (np.random.randn() * (wtd_avg - frog_w))
+    frog_w_new = frog_w + (np.random.randn() * (avg - frog_w))
+
+
+    # frog_w_new=frog_w + 0.5*np.random.randn()*(frog_b - frog_w) + 0.5*np.random.randn()*(frog_g - frog_w) 
     
+    frog_w_new.astype(int)    
     # s=(mean_memeplexes(frogs,memeplex))
     # frog_w_new = frog_w +  np.random.randn()*np.array(s)
     
-    a=( (frog_g - frog_w))
-    a=a/(min(abs(a))+0.1)    
-    frog_w_new = frog_w +  a
+    #OUR MODIFICATION
+    # a=( (frog_g - frog_w))
+    # a=a/(min(abs(a))+0.1)    
+    # frog_w_new = frog_w +  a
+
     # print(np.random.randn()*a)
+    
     # If change not better, move worst wrt greatest frog
+    #OUR MODIFICATION
     if opt_func(frog_w_new) > opt_func(frog_w):
-        a=( (frog_g - frog_w))
-        a=a/(min(abs(a))+0.1)
-        frog_w_new = frog_w + a
-        # frog_w_new = frog_w + (np.random.randn() * (frog_g - frog_w))
+        # a=( (frog_g - frog_w))
+        # a=a/(min(abs(a))+0.1)
+        # frog_w_new = frog_w + a
+    
+        frog_w_new = frog_w + (np.random.randn() * (frog_g - frog_w))
+        frog_w_new.astype(int)
+
     # print(frog_w,opt_func(frog_w),"|",frog_w_new,opt_func(frog_w_new))
     # If change not better, random new worst frog
     if opt_func(frog_w_new) > opt_func(frog_w):
+        global count
+        count+=1
         frog_w_new=np.random.randint(0,28,(1,2))
         frog_w_new=frog_w_new[0]
         # frog_w_new = gen_frogs(1, frogs.shape[1], sigma, mu)[0]
@@ -149,7 +180,9 @@ def local_search(frogs, memeplex, opt_func, sigma, mu):
         for i in allf.keys():
             if(list(f_w) in allf[i]):
                 if(list(f_w_new) not in allf[i]):
-                    allf[i].append(f_w_new)
+                    # print("---------------",allf[i][-1])
+                    if(opt_func(np.array(allf[i][-1])) > 1):
+                        allf[i].append(f_w_new)
     else:
         if(f_w_new not in allf[tuple(f_w)]):
             allf[tuple(f_w)].append(f_w_new)
@@ -211,8 +244,7 @@ def sfla(optimum,opt_func, frogs, dimension=2, sigma=1, mu=0, mplx_no=5, mplx_it
         # For each memeplex
         for mplx_idx, memeplex in enumerate(memeplexes):
             # For number of memeplex iterations
-            global count
-            count=0
+
             for j in range(mplx_iters):
                 # Perform local search
                 frogs = local_search(frogs, memeplex, opt_func, sigma, mu)
@@ -224,7 +256,7 @@ def sfla(optimum,opt_func, frogs, dimension=2, sigma=1, mu=0, mplx_no=5, mplx_it
             if opt_func(new_best_solun) < opt_func(best_solun):
                 best_solun = new_best_solun
     # return best_solun, frogs, memeplexes.astype(int)
-    allf1=dict()
+    # allf1=dict()
     # for i in allf.keys():
     #     for x in allf[i]:
     #         # x[0]=int(x[0])
@@ -234,21 +266,55 @@ def sfla(optimum,opt_func, frogs, dimension=2, sigma=1, mu=0, mplx_no=5, mplx_it
     #             allf1[i].append(list(x))
     #         if list(x) not in allf[i]:
     #             allf1[i].append(list(x))
+    final=dict()
+    frogs=allf
+    for f in frogs.keys():
+        for t in frogs[f]:
+            if t[0]==best_solun[0] and t[1]==best_solun[1]:
+                ctd=[]
+                ctd.append(f)
+                for i in range(len(frogs[f])-1):
+                    if opt_func(np.array(ctd[-1]) ) < opt_func( np.array(frogs[f][i]) ):
+                        continue
+                    # plt.scatter(frogs[f][i][0],frogs[f][i][1])
+                    ctd.append(frogs[f][i])
+                # print(f,":",ctd)
+                final[f]=ctd
+                # plt.show() 
 
-    return best_solun, allf, memeplexes.astype(int)
+    return best_solun, final, memeplexes.astype(int)
 
 def main():
     # Run algorithm
     #Frogs
-    frogs=[]
-    for i in range(100):
-        frogs.append(np.array([i,i]))
-    frogs=np.array(frogs)
+    # frogs=[]
+    # for i in range(100):
+        # frogs.append(np.array([i,i]))
+    # frogs=np.array(frogs)
     # frogs=np.reshape(frogs,(100,2))
     
-    solun, frogs, memeplexes = sfla([0,0],opt_func, 20, 2, 1, 0, 5, 10, 10)
-    key=tuple()
-    lent=0
+    solun, frogs, memeplexes = sfla([15,15],opt_func, 20, 2, 1, 0, 5, 10, 10)
+    # for f in frogs.keys():
+    #     for t in frogs[f]:
+    #         if t[0]==solun[0] and t[1]==solun[1]:
+    #             ctd=[]
+    #             ctd.append(f)
+    #             for i in range(len(frogs[f])-1):
+    #                 if opt_func(np.array(ctd[-1]) ) < opt_func( np.array(frogs[f][i]) ):
+    #                     continue
+    #                 plt.scatter(frogs[f][i][0],frogs[f][i][1])
+    #                 ctd.append(frogs[f][i])
+    #             print(f,":",ctd)    
+    #             # plt.show() 
+    
+        # l=frogs[f]
+        # for s in l:
+            # if s[0]==solun[0] and s[1]==solun[1]:
+                # count+=1
+                # print("The frog ",f," reaches the solution")
+    # print("\n","total Frogs:",len(list(frogs.keys())),"Frogs that reach sol:",count)
+    # key=tuple()
+    # lent=0
     # for i in frogs.keys():
         # print(i,":",(frogs[i]))
     #     if(len(frogs[i])>lent):
@@ -256,19 +322,52 @@ def main():
     #         lent=len(frogs[i])
     # print(frogs[key])
     # print(frogs)
-    print("Optimal Solution (closest to zero): {}".format(solun))
+    global count
+    print("Optimal Solution (closest to zero): {}".format(solun),count)
+    tmp=count
+    count=0
+    return solun,tmp
     # Place memeplexes
-    # for idx, memeplex in enumerate(memeplexes):
-    #     plt.scatter(frogs[memeplex, 0], frogs[memeplex, 1], marker='x', label="memeplex {}".format(idx))
-    # plt.scatter(solun[0], solun[1], marker='o', label="Optimal Solution")
+    # frogs=list(frogs)
+    '''
+    for idx, memeplex in enumerate(memeplexes):
+        print(frogs[memeplex],frogs[memeplex])
+        plt.scatter(frogs[memeplex, 0], frogs[memeplex, 1], marker='x', label="memeplex {}".format(idx))
+    plt.scatter(solun[0], solun[1], marker='o', label="Optimal Solution")
     # plt.scatter(13, 29, marker='*', label='Actual Solution')
     # # Plot properties
-    # plt.legend()
-    # plt.xlabel("x-axis")
-    # plt.ylabel("y-axis")
-    # plt.title("Shuffled Frogs")
+    plt.legend()
+    plt.xlabel("x-axis")
+    plt.ylabel("y-axis")
+    plt.title("Shuffled Frogs")
     # # Show plot
-    # plt.show()
-
+    plt.show()
+    '''
 if __name__ == '__main__':
-    main()
+    # main()
+    
+    l=[]
+    mx,my=0,0
+    c=0
+    for i in range(10):
+        sol,tmp=main()
+        # global count
+        # count=0
+        c+=tmp
+        mx+=sol[0]
+        my+=sol[1]
+        l.append(sol)
+    
+    mx=mx//10
+    my=my//10
+    print(mx,my)
+    vx,vy=0,0
+    d=0
+    for i in l:
+        # print(mx,i[0],mx,i[1])
+        # print(math.sqrt(pow(i[0]-mx,2)+pow(i[1]-my,2)))
+        d+=math.sqrt(pow(i[0]-15,2)+pow(i[1]-15,2))
+        # vx=+pow(mx-i[0],2)
+        # vy=+pow(mx-i[1],2)
+    print("Variance:",d)
+    print("Avg New Random Frogs:",c/10)

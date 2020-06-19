@@ -7,7 +7,7 @@ from enemy_class import *
 from algorithm import *
 
 import matplotlib.pyplot as plt
-
+count=0
 pygame.init()
 vec = pygame.math.Vector2
 
@@ -96,6 +96,8 @@ class App:
     def make_enemies(self):
         for idx, pos in enumerate(self.e_pos):
             self.enemies.append(Enemy(self, vec(pos), idx))
+            # if idx==0:
+                # break
 
     def draw_grid(self):
         for x in range(WIDTH//self.cell_width):
@@ -170,6 +172,9 @@ class App:
         self.player.update()
         optimum=[self.player.grid_pos[0],self.player.grid_pos[1]]
         sol,frog,mem=sfla(optimum,opt_func,20, 2, 1, 0, 5, 6, 7)
+        # global count
+        # count+=1
+        # print(count)
         self.frog=frog
         # print(optimum)
         # print(len(frog))
