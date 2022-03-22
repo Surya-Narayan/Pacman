@@ -18,3 +18,8 @@ The game is built using the python pygame module
 * To run the game with Shuffled Frog Leaping Algorithm
   1. `cd SFLA_sol`
   2. `python main.py`
+
+## Credits
+
+* https://github.com/a-plus-coding/pacman-with-python
+* https://www.youtube.com/playlist?list=PLryDJVmh-ww3AMl8NSjp9YygWWTOfePu7
