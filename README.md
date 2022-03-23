@@ -1,5 +1,7 @@
 # Shuffled Frog Leaping Algorithm in Pacman
 
+<img src="https://user-images.githubusercontent.com/45272841/159605491-223d76d4-a122-4032-96ec-af203f309467.png" width="500">
+
 ## About
 Implementation of two algorithms to automate the movement of the ghosts (the enemies) in PacMan.
 1. Breath First Search
